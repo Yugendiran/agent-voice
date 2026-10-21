@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "agent-voice"
 version = "0.4.0"
-description = "Speaks what Claude Code and Codex say while they work, using a local TTS model."
+description = "Give life to your agents! Live voice narration for Claude Code and Codex, using a local TTS model."
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
 license = { text = "MIT" }

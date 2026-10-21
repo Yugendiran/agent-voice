@@ -2,7 +2,7 @@
 
 # 🔊 Agent Voice
 
-**Hear your coding agent think out loud.**
+**Give life to your agents!**
 
 Live narration, alerts and spoken work summaries from **Claude Code** and **Codex**,
 with a neural voice that runs entirely on your machine.
