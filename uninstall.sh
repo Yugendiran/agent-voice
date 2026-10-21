@@ -5,6 +5,7 @@ CLI="$APP_HOME/venv/bin/agent-voice"
 if [ -x "$CLI" ]; then
   "$CLI" stop
   "$CLI" autostart off
+  "$CLI" instructions off
 fi
 rm -f "$HOME/.local/bin/agent-voice"
 rm -rf "$APP_HOME"

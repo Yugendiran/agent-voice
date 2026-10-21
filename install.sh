@@ -88,6 +88,10 @@ esac
 step "Downloading the voice model"
 "$VENV/bin/agent-voice" download
 
+# ------------------------------------------------------------------ agent instructions
+step "Teaching Claude Code and Codex to write short voice lines"
+"$VENV/bin/agent-voice" instructions on
+
 # ------------------------------------------------------------------ start
 if [ "$AUTOSTART" = 1 ]; then
   step "Starting agent-voice (and at every login)"

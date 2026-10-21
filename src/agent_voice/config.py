@@ -20,6 +20,9 @@ CONTROL_PORT = int(os.environ.get("AGENT_VOICE_PORT", "47821"))
 class Config:
     # "kokoro" (local neural TTS) or "system" (Windows SAPI / macOS say / espeak).
     engine: str = "kokoro"
+    # "marked": speak only the short 🔊 lines the agents write for you (see
+    # `agent-voice instructions`). "all": speak every message.
+    speak: str = "marked"
     voice: str = "af_heart"
     speed: float = 1.1
     # "interrupt": a new message cuts off the one being spoken.

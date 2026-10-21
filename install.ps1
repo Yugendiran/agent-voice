@@ -137,6 +137,10 @@ Step "Downloading the voice model"
 if ($LASTEXITCODE -ne 0) { throw "model download failed" }
 Ok "ready"
 
+# ---------------------------------------------------------------- agent instructions
+Step "Teaching Claude Code and Codex to write short voice lines"
+& $Cli instructions on
+
 # ---------------------------------------------------------------- start
 if ($NoAutostart) {
     & $Cli autostart off | Out-Null

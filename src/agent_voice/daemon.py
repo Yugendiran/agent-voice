@@ -9,6 +9,7 @@ import threading
 
 from .cleaner import clean
 from .config import CONTROL_PORT, Config
+from .instructions import voice_lines
 from .sources import Utterance, default_sources
 from .speaker import Speaker
 from .tts import make_engine
@@ -40,7 +41,7 @@ class Narrator:
             return "starting"
         if cmd == "status":
             state = "muted" if self.speaker.muted else "speaking"
-            return f"running ({state}, engine={self.engine.name}, voice={self.cfg.voice}, mode={self.cfg.mode})"
+            return f"running ({state}, speak={self.cfg.speak}, engine={self.engine.name}, voice={self.cfg.voice}, mode={self.cfg.mode})"
         if cmd in ("mute", "unmute", "toggle"):
             muted = {"mute": True, "unmute": False}.get(cmd, not self.speaker.muted)
             self.speaker.muted = self.cfg.muted = muted
@@ -81,14 +82,19 @@ class Narrator:
             return False
         return True
 
+    def speech_for(self, u: Utterance) -> str:
+        """What to say for a message, or "" to stay silent."""
+        if not self.wants(u):
+            return ""
+        text = voice_lines(u.text) if self.cfg.speak == "marked" else u.text
+        return clean(text, self.cfg.max_chars) if text else ""
+
     def run(self) -> None:
         server = self._server
         log.info("agent-voice running (engine=%s, port=%d)", self.engine.name, CONTROL_PORT)
         try:
             for utterance in Watcher(default_sources()).run(self._stop.is_set):
-                if not self.wants(utterance):
-                    continue
-                text = clean(utterance.text, self.cfg.max_chars)
+                text = self.speech_for(utterance)
                 if text:
                     self.speaker.say(text)
         except KeyboardInterrupt:

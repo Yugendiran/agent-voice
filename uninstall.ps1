@@ -5,6 +5,7 @@ $Cli = Join-Path $AppHome "venv\Scripts\agent-voice.exe"
 if (Test-Path $Cli) {
     & $Cli stop
     & $Cli autostart off
+    & $Cli instructions off
 }
 $BinDir = Join-Path $AppHome "bin"
 $userPath = (Get-ItemProperty -Path HKCU:\Environment -Name Path -ErrorAction SilentlyContinue).Path

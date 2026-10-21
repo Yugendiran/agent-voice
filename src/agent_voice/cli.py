@@ -10,7 +10,7 @@ import sys
 import threading
 import time
 
-from . import autostart
+from . import autostart, instructions
 from .cleaner import clean
 from .config import CONFIG_PATH, HOME, LOG_PATH, Config
 from .daemon import AlreadyRunning, Narrator, send
@@ -28,6 +28,9 @@ commands:
   run               run in the foreground, logging to the console (Ctrl+C stops)
   config            show settings;  config KEY VALUE  changes one
   voices            list available voices
+  instructions on|off
+                    teach Claude Code and Codex to write short 🔊 voice lines
+                    (adds a block to ~/.claude/CLAUDE.md and ~/.codex/AGENTS.md)
   autostart on|off  start automatically when you log in
   download          (re)download the voice model
   log               show the last lines of the log
@@ -128,7 +131,27 @@ def cmd_say(text: str) -> int:
     return 0
 
 
+def cmd_instructions(choice: str) -> int:
+    for agent, path in instructions.targets().items():
+        if choice == "on":
+            print(f"  {agent:<12} {instructions.install(path)}: {path}")
+        elif choice == "off":
+            print(f"  {agent:<12} {'removed' if instructions.remove(path) else 'not present'}: {path}")
+        else:
+            print(f"  {agent:<12} {'on' if instructions.installed(path) else 'off'}: {path}")
+    if choice == "on":
+        print("\nNew Claude Code / Codex sessions will add short 🔊 lines; agent-voice speaks only those.")
+        print("Sessions that are already open keep their old instructions until restarted.")
+    if choice == "off" and Config.load().speak == "marked":
+        print("\nNote: speak=marked, so nothing will be spoken. Use: agent-voice config speak all")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
+    # Windows pipes default to cp1252, which cannot print 🔊; don't crash on it.
+    for stream in (sys.stdout, sys.stderr):
+        if stream is not None and hasattr(stream, "reconfigure"):
+            stream.reconfigure(errors="replace")
     parser = argparse.ArgumentParser(prog="agent-voice", usage=USAGE, add_help=False)
     parser.add_argument("command", nargs="?", default="help")
     parser.add_argument("args", nargs=argparse.REMAINDER)
@@ -168,6 +191,8 @@ def main(argv: list[str] | None = None) -> int:
         else:
             print("autostart is", "on" if autostart.enabled() else "off")
         return 0
+    if cmd == "instructions":
+        return cmd_instructions((args[0] if args else "status").lower())
     if cmd == "download":
         from .tts import download_models
 
