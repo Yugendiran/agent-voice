@@ -20,6 +20,8 @@ log = logging.getLogger("agent_voice")
 
 # Cap for agent-written voice lines (a work summary is ~300-500 characters).
 MARKED_MAX_CHARS = 1200
+# Messages without a 🔊 line are spoken up to about two sentences.
+UPDATE_MAX_CHARS = 260
 
 
 class AlreadyRunning(RuntimeError):
@@ -105,12 +107,19 @@ class Narrator:
         """What to say for a message, or "" to stay silent."""
         if not self.wants(u):
             return ""
-        if self.cfg.speak == "marked":
+        if self.cfg.speak == "all":
+            text, limit = u.text, self.cfg.max_chars
+        elif voice := voice_lines(u.text):
             # The agent wrote these for the ear and chose their length, so only
             # guard against runaways instead of trimming to max_chars.
-            text, limit = voice_lines(u.text), max(self.cfg.max_chars, MARKED_MAX_CHARS)
+            text, limit = voice, max(self.cfg.max_chars, MARKED_MAX_CHARS)
+        elif self.cfg.narration == "live":
+            # No 🔊 line: the agent's in-between update (or a final message that
+            # forgot its summary) is still worth hearing; its first sentences
+            # carry the point.
+            text, limit = u.text, UPDATE_MAX_CHARS
         else:
-            text, limit = u.text, self.cfg.max_chars
+            return ""
         return clean(text, limit) if text else ""
 
     def run(self) -> None:

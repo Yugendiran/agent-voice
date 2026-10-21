@@ -37,11 +37,11 @@ You give the agent a task and look away. agent-voice talks you through it:
 ```
 
 Reading every message aloud would be noise, so **the agent decides what's worth
-saying**. agent-voice teaches it three kinds of voice lines:
+saying**. You hear three kinds of updates:
 
 | | When | Sounds like |
 |---|---|---|
-| 🎙️ **Live narration** | starting a step, finding a cause, tests pass/fail | *"Found it, the button still calls the old endpoint."* |
+| 🎙️ **Live narration** | the short updates the agent writes between steps (first sentence or two) | *"Found it, the button still calls the old endpoint."* |
 | 🚨 **Alerts** | it needs your input or approval, or it's blocked | *"I need your approval before I delete the old migrations."* |
 | 📋 **Work summary** | end of a task | what was done and why, how it was checked, what's left |
 
@@ -52,7 +52,7 @@ saying**. agent-voice teaches it three kinds of voice lines:
 <td width="50%" valign="top">
 
 **🧠 Agent-curated speech**<br>
-The agent picks the moments; routine progress stays silent. Want less? `narration quiet`.
+You hear the agent's in-between updates and its 🔊 alerts and summaries; code and details stay on screen. Want less? `narration quiet`.
 Want everything? `speak all`.
 
 **🔒 Private and offline**<br>
@@ -182,8 +182,8 @@ Change any setting with `agent-voice config KEY VALUE`. It applies immediately, 
 
 | Key | Default | Description |
 |---|---|---|
-| `narration` | `live` | `live`: commentary + alerts + summary. `quiet`: alerts + summary only |
-| `speak` | `marked` | `marked`: only the 🔊 lines the agent writes. `all`: every message in full |
+| `narration` | `live` | `live`: in-between updates + 🔊 alerts + summary. `quiet`: only the 🔊 alerts + summary |
+| `speak` | `marked` | `marked`: a message's 🔊 line if it has one, else its first sentences (per `narration`). `all`: every message in full |
 | `voice` | `af_heart` | Kokoro voice, see below |
 | `speed` | `1.1` | Speaking rate |
 | `engine` | `kokoro` | `kokoro` (neural) or `system` (Windows SAPI / macOS `say` / espeak-ng, no download) |
@@ -231,7 +231,7 @@ flowchart LR
     I["agent-voice instructions<br/>(CLAUDE.md / AGENTS.md)"] -. teaches .-> A
     A["Claude Code / Codex"] -->|writes session| T[("transcript<br/>.jsonl")]
     T -->|tail new lines| W["watcher"]
-    W -->|keep 🔊 lines| C["cleaner<br/>(paths, URLs, code → speech)"]
+    W -->|🔊 line, or the update's<br/>first sentences| C["cleaner<br/>(paths, URLs, code → speech)"]
     C --> Q["queue"]
     Q --> K["Kokoro TTS<br/>(local)"]
     K --> S(("🔊"))
@@ -239,7 +239,9 @@ flowchart LR
 ```
 
 1. **Instructions.** A short section in the agents' global instruction files asks them to write
-   🔊 lines for live narration, alerts and an end-of-task summary, in plain spoken English.
+   in-between updates that lead with the point (spoken automatically, first sentence or two),
+   plus 🔊 lines for alerts and an end-of-task summary, in plain spoken English.
+   When a message has a 🔊 line, only that line is spoken.
    The wording lives in [`instructions.py`](src/agent_voice/instructions.py).
 2. **Transcripts.** Both agents already save every session as JSON lines. agent-voice tails
    only the files being written right now, and never reads out older history.
@@ -281,7 +283,7 @@ copy running. `CLAUDE_CONFIG_DIR` and `CODEX_HOME` are respected.
 <details>
 <summary><b>It talks too much or too little</b></summary>
 
-- Too much: `agent-voice config narration quiet` keeps only alerts and the end-of-task summary.
+- Too much: `agent-voice config narration quiet` keeps only the 🔊 alerts and the end-of-task summary.
 - Too little: `agent-voice config narration live`, or `speak all` for everything.
 
 </details>

@@ -46,7 +46,7 @@ def test_install_keeps_user_content(tmp_path):
     assert END not in path.read_text(encoding="utf-8")
 
 
-def test_narrator_speaks_only_marked_lines_by_default():
+def test_narrator_speech_per_narration_style():
     from agent_voice.config import Config
     from agent_voice.daemon import Narrator
     from agent_voice.sources import Utterance
@@ -55,11 +55,35 @@ def test_narrator_speaks_only_marked_lines_by_default():
     n.cfg = Config()
     marked = Utterance("claude", "Looked at `a.py`.\n🔊 Found the bug in the parser.", False, "1")
     plain = Utterance("claude", "Reading the files now.", False, "2")
+
+    # live (default): a 🔊 line wins; in-between updates are spoken as written.
+    assert n.speech_for(marked) == "Found the bug in the parser."
+    assert n.speech_for(plain) == "Reading the files now."
+
+    # quiet: only 🔊 lines.
+    n.cfg.narration = "quiet"
     assert n.speech_for(marked) == "Found the bug in the parser."
     assert n.speech_for(plain) == ""
 
     n.cfg.speak = "all"
     assert n.speech_for(plain) == "Reading the files now."
+
+
+def test_long_update_without_voice_line_is_cut_to_its_first_sentences():
+    from agent_voice.config import Config
+    from agent_voice.daemon import UPDATE_MAX_CHARS, Narrator
+    from agent_voice.sources import Utterance
+
+    n = Narrator.__new__(Narrator)
+    n.cfg = Config()
+    update = (
+        "The test file is fixed. I'll re-read the instructions file and fix the f-string. "
+        + "Then I will go through every other module in the package one by one. " * 10
+        + "\n```python\nprint('code is never spoken')\n```"
+    )
+    spoken = n.speech_for(Utterance("claude", update, False, "u"))
+    assert spoken.startswith("The test file is fixed. I'll re-read the instructions file")
+    assert len(spoken) <= UPDATE_MAX_CHARS and "print" not in spoken
 
 
 def test_marked_work_summary_is_not_trimmed():

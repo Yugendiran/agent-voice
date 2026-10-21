@@ -24,27 +24,26 @@ NARRATION_STYLES = ("live", "quiet")
 _INTRO = f"""## Voice updates (agent-voice)
 
 The user hears your work through text-to-speech while looking away from the
-screen. Only lines that start with `{VOICE_MARK} ` are spoken; everything else is
-read on screen only. Write each voice line as a single paragraph on one line,
-at most one per message.
+screen. Lines that start with `{VOICE_MARK} ` are spoken in full; when a message
+has one, only that line is spoken. Write each voice line as a single paragraph
+on one line, at most one per message.
 """
 
-_LIVE = f"""
-**Live narration (while you work).** Talk the user through your work the way a
-developer pairing with them would think out loud. Add a short voice line when
-you start a new step, form a hypothesis, find the cause of a problem, see a
-test fail or pass, or change approach. One sentence, under 15 words, first
-person, present tense. Don't narrate every tool call and don't repeat yourself;
-a few lines per task is right.
-
-Examples: `{VOICE_MARK} Looking at how the join button talks to the server.`
-`{VOICE_MARK} Found it, the button still calls the old session endpoint.`
-`{VOICE_MARK} Two tests fail now, checking why.`
+_LIVE = """
+**Live narration (while you work).** The short updates you write to the user
+between tool calls are read aloud automatically (their first sentence or two),
+so the user can follow along as if a developer were thinking out loud next to
+them. Keep writing those updates as you work: when you start a new step, form
+a hypothesis, find the cause of a problem, see tests fail or pass, or change
+approach. Put the point first, in a plain spoken sentence: "Found it, the
+button still calls the old session endpoint." Code, paths and details can
+follow later in the message. Don't repeat yourself, and don't add a voice line
+to these updates; save those for alerts and the summary below.
 """
 
 _QUIET = """
-**No running commentary.** Skip voice lines for routine progress ("reading
-files", "running tests"): most messages should have none.
+**No running commentary.** Only voice lines are spoken. Skip them for routine
+progress ("reading files", "running tests"): most messages should have none.
 """
 
 _REST = f"""

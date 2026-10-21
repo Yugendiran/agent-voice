@@ -28,7 +28,7 @@ _BULLET = re.compile(r"^\s*(?:[-*+•]|\d+[.)])\s+", re.M)
 _EMPHASIS = re.compile(r"(\*\*|__|\*|_|~~)(?=\S)(.+?)(?<=\S)\1")
 _HRULE = re.compile(r"^\s*([-*_])\1{2,}\s*$", re.M)
 _ARROWS = {"→": " to ", "←": " from ", "⇒": " so ", "—": ", ", "–": ", ", "…": "..."}
-_SENTENCE_END = re.compile(r"(?<=[.!?])\s+")
+_CLAUSE_END = re.compile(r"(?<=[.!?:;])\s+")
 
 
 def _inline_code(match: re.Match) -> str:
@@ -92,10 +92,12 @@ def _truncate(text: str, max_chars: int) -> str:
     if len(text) <= max_chars:
         return text
     out = ""
-    for sentence in _SENTENCE_END.split(text):
+    # Cut between sentences, or after a clause ending in ":" or ";" (agents often
+    # write "I added X:" followed by a list).
+    for sentence in _CLAUSE_END.split(text):
         if out and len(out) + len(sentence) + 1 > max_chars:
             break
         out = f"{out} {sentence}".strip()
     if len(out) > max_chars:  # a single very long sentence
-        out = out[:max_chars].rsplit(" ", 1)[0] + "."
-    return out
+        out = out[:max_chars].rsplit(" ", 1)[0].rstrip(",") + "."
+    return re.sub(r"[:;]$", ".", out)
