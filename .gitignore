@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtualenvs (the installer uses ~/.agent-voice/venv; local dev venvs may live here)
+.venv/
+venv/
+env/
+
+# Test / tool caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Voice models and audio are downloaded at install time; never commit them
+*.onnx
+*.bin
+*.part
+*.wav
+*.mp3
+models/
+
+# Logs and local secrets
+*.log
+.env
+.env.*
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
