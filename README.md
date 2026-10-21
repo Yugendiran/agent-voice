@@ -135,6 +135,26 @@ Then **restart your Claude Code / Codex sessions**. That's it.
 > install, fixes for common problems, updating and uninstalling are all in the
 > 📖 **[Install Guide](Install%20Guide.md)**.
 
+---
+
+### ✅ Test it
+
+Open a **new** terminal (so `agent-voice` is on your PATH) and run:
+
+```bash
+agent-voice status
+agent-voice say "Hello! Agent Voice is installed and ready."
+```
+
+`status` should print `running (speaking, ...)`, and you should hear the sentence.
+While it's talking, press <kbd>Shift</kbd>+<kbd>Backspace</kbd> to check that the stop shortcut cuts it off.
+
+Then try it for real: start a **new** Claude Code or Codex session and give it a small task.
+You'll hear it narrate as it works and sum up when it's done.
+
+> [!NOTE]
+> Silent? Run `agent-voice log` and see [Troubleshooting](#-troubleshooting).
+
 ## 🎛 Usage
 
 agent-voice runs in the background. These are the commands you'll use:
