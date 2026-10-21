@@ -1,41 +1,88 @@
-# agent-voice
+<div align="center">
 
-Hear what **Claude Code** and **Codex** say while they work.
+# 🔊 Agent Voice
 
-Coding agents write a lot as they go, and hearing all of it is too much. So
-agent-voice lets **the agent decide what's worth saying**. It teaches Claude
-Code and Codex to write spoken lines, starting with 🔊, like a developer
-talking you through their work:
+**Hear your coding agent think out loud.**
+
+Live narration, alerts and spoken work summaries from **Claude Code** and **Codex**,
+with a neural voice that runs entirely on your machine.
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![Python](https://img.shields.io/badge/python-3.10%E2%80%933.13-3776AB?logo=python&logoColor=white)
+![Platforms](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)
+![Offline](https://img.shields.io/badge/runs-100%25%20local-success)
+[![Claude Code](https://img.shields.io/badge/works%20with-Claude%20Code-D97757)](https://claude.com/claude-code)
+[![Codex](https://img.shields.io/badge/works%20with-Codex-000000)](https://github.com/openai/codex)
+
+[Install](#-install) · [Usage](#-usage) · [Settings](#%EF%B8%8F-settings) · [How it works](#-how-it-works) · [Troubleshooting](#-troubleshooting)
+
+</div>
+
+---
+
+## ✨ What it sounds like
+
+You give the agent a task and look away. agent-voice talks you through it:
 
 ```text
 🔊 Opening the shop file to look at the cart total and tax code.
 🔊 Found three bugs: quantity is ignored, rounding drops cents, and tax divides by ten.
-   ...edits, test runs, diffs (shown on screen, not spoken)...
+
+   ... edits, test runs and diffs scroll by on screen, unspoken ...
+
 🔊 I fixed the cart total and the tax calculation. The total now multiplies each
    price by its quantity and keeps two decimal places, and the tax now treats
    eighteen as eighteen percent. My quick checks all passed. The tax result still
    isn't rounded, so tell me if you want it rounded to two decimals too.
 ```
 
-That's **live narration** while it works, **alerts** when it needs you or is
-blocked, and a **work summary** at the end: what was done, how it was checked,
-and what's left. agent-voice speaks only those lines, with a small neural voice
-that runs entirely on your machine.
+Reading every message aloud would be noise, so **the agent decides what's worth
+saying**. agent-voice teaches it three kinds of voice lines:
 
-- The agent picks the moments. Prefer only alerts and the summary? `agent-voice config narration quiet`
-  (or `speak all` to hear every message in full)
-- Never reads tool calls, command output, code or diffs
-- Turns screen-only text into speech-friendly text: code blocks are skipped, URLs become "a link",
-  paths become "a file path", IPs/hashes/UUIDs are named instead of spelled out
-- Local and offline: [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) (~120 MB, CPU, ~3x faster than real time),
-  or the built-in OS voice with no download at all
-- Works with Claude Code (CLI, VS Code, desktop) and Codex (CLI, VS Code) at the same time
-- Lines play in order and stale ones are dropped, so it never falls behind
-- Press Shift+Backspace anywhere to stop the current speech (configurable)
+| | When | Sounds like |
+|---|---|---|
+| 🎙️ **Live narration** | starting a step, finding a cause, tests pass/fail | *"Found it, the button still calls the old endpoint."* |
+| 🚨 **Alerts** | it needs your input or approval, or it's blocked | *"I need your approval before I delete the old migrations."* |
+| 📋 **Work summary** | end of a task | what was done and why, how it was checked, what's left |
 
-## Install
+## 🚀 Features
 
-One line, nothing to download first.
+<table>
+<tr>
+<td width="50%" valign="top">
+
+**🧠 Agent-curated speech**<br>
+The agent picks the moments; routine progress stays silent. Want less? `narration quiet`.
+Want everything? `speak all`.
+
+**🔒 Private and offline**<br>
+[Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) runs on your CPU, about 3× faster than real time.
+No API keys, no cloud, nothing leaves your machine.
+
+**🗣️ Speech-friendly text**<br>
+Code blocks are skipped. URLs become "a link", paths "a file path", and IPs, hashes
+and UUIDs are named instead of spelled out.
+
+</td>
+<td width="50%" valign="top">
+
+**🤝 Claude Code + Codex together**<br>
+CLI, VS Code and desktop sessions, several at once. No hooks or plugins: it never
+slows the agent down.
+
+**⌨️ Stop it instantly**<br>
+Press <kbd>Shift</kbd>+<kbd>Backspace</kbd> anywhere to cut off the current speech.
+Any key combo you like.
+
+**📦 One-line install**<br>
+Sets up Python via pyenv, a private virtualenv, the voice model and autostart.
+Nothing else on your system is touched.
+
+</td>
+</tr>
+</table>
+
+## 📥 Install
 
 **Windows** (PowerShell):
 
@@ -49,120 +96,220 @@ irm https://raw.githubusercontent.com/Yugendiran/agent-voice/main/install.ps1 | 
 curl -fsSL https://raw.githubusercontent.com/Yugendiran/agent-voice/main/install.sh | bash
 ```
 
-Or from a clone: double-click `install.cmd` on Windows, or run `./install.sh`.
-To update later, run the same command again: it reuses what's already installed.
+Then **start a new Claude Code or Codex session**. That's it.
 
-The installer:
+> [!TIP]
+> To update, run the same command again; it reuses everything already installed.
+> From a clone you can also double-click `install.cmd` (Windows) or run `./install.sh`.
 
-1. installs [pyenv](https://github.com/pyenv/pyenv) ([pyenv-win](https://github.com/pyenv-win/pyenv-win) on Windows) if you don't have it,
-   and the Python version in `.python-version` through it;
-2. creates a private virtualenv in `~/.agent-voice/venv` (nothing touches your other Pythons);
-3. downloads the voice model to `~/.agent-voice/models`;
-4. adds the `agent-voice` command to your PATH;
-5. adds a short "voice updates" section to `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`
-   (between `agent-voice:begin`/`end` markers; your own content is kept);
-6. starts agent-voice now and at every login. To skip this, run the installer from a clone with
-   `-NoAutostart` (Windows) / `--no-autostart`, or turn it off later with `agent-voice autostart off`.
+<details>
+<summary><b>What the installer does</b></summary>
 
-That's it. Start a **new** Claude Code or Codex session and you'll hear it when it has something to tell you.
+1. Installs [pyenv](https://github.com/pyenv/pyenv) ([pyenv-win](https://github.com/pyenv-win/pyenv-win) on Windows) if missing, then the Python version in [`.python-version`](.python-version)
+2. Creates a private virtualenv in `~/.agent-voice/venv`, leaving your other Pythons alone
+3. Downloads the voice model (~120 MB) to `~/.agent-voice/models`
+4. Adds the `agent-voice` command to your PATH
+5. Adds a short *Voice updates* section to `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`,
+   between `agent-voice:begin` / `end` markers. Your own content is kept.
+6. Starts agent-voice now and at every login. Skip this with `-NoAutostart` / `--no-autostart`
+   when running from a clone, or later with `agent-voice autostart off`.
 
-## Use
+</details>
 
-```text
-agent-voice status          is it running?
-agent-voice start | stop | restart
-agent-voice mute | unmute   (toggle flips it)
-agent-voice skip            cut off the current sentence
-                            (or press Shift+Backspace anywhere, see `hotkey` below)
-agent-voice say "hello"     test the voice
-agent-voice voices          list voices
-agent-voice config          show settings
-agent-voice config KEY VAL  change a setting (applies immediately)
-agent-voice instructions on|off   add/remove the voice-line instructions for the agents
-agent-voice autostart on|off
-agent-voice log             recent log lines
-agent-voice run             run in the foreground with console logging
+## 🎛 Usage
+
+agent-voice runs in the background. These are the commands you'll use:
+
+| Command | What it does |
+|---|---|
+| `agent-voice status` | Is it running, and with which settings? |
+| `agent-voice start` · `stop` · `restart` | Control the background narrator |
+| `agent-voice mute` · `unmute` · `toggle` | Silence it without stopping it |
+| `agent-voice skip` | Cut off the current line (or press <kbd>Shift</kbd>+<kbd>Backspace</kbd>) |
+| `agent-voice say "hello"` | Speak some text, handy for trying voices |
+| `agent-voice voices` | List the available voices |
+| `agent-voice config` | Show settings; `config KEY VALUE` changes one, live |
+| `agent-voice instructions on\|off` | Add or remove the voice-line instructions for the agents |
+| `agent-voice autostart on\|off` | Start at login, or don't |
+| `agent-voice log` | Recent log lines, including everything spoken |
+| `agent-voice run` | Run in the foreground with console logging |
+
+## ⚙️ Settings
+
+Change any setting with `agent-voice config KEY VALUE`. It applies immediately, with no restart.
+
+| Key | Default | Description |
+|---|---|---|
+| `narration` | `live` | `live`: commentary + alerts + summary. `quiet`: alerts + summary only |
+| `speak` | `marked` | `marked`: only the 🔊 lines the agent writes. `all`: every message in full |
+| `voice` | `af_heart` | Kokoro voice, see below |
+| `speed` | `1.1` | Speaking rate |
+| `engine` | `kokoro` | `kokoro` (neural) or `system` (Windows SAPI / macOS `say` / espeak-ng, no download) |
+| `mode` | `queue` | `queue`: lines play in order, stale backlog dropped. `interrupt`: new lines cut in |
+| `hotkey` | `shift+backspace` | Global stop shortcut, e.g. `ctrl+alt+x`, `f9`; `off` disables it |
+| `claude` / `codex` | `true` | Which agents to listen to |
+| `final_only` | `false` | Only the last message of each turn |
+| `max_chars` | `400` | With `speak all`, long messages are trimmed to their first sentences |
+| `muted` | `false` | Same as `agent-voice mute` |
+
+Settings are stored in `~/.agent-voice/config.json`.
+
+### 🎤 Voices
+
+```powershell
+agent-voice voices                   # list them all
+agent-voice config voice am_michael  # switch
+agent-voice say "How do I sound?"    # try it
 ```
 
-### Settings
+The first letter is the accent (`a` American, `b` British), the second the gender (`f` / `m`).
+Good ones to start with: `af_heart`, `af_bella`, `am_michael`, `am_fenrir`, `bf_emma`, `bm_george`.
 
-| key          | default     | meaning |
-|--------------|-------------|---------|
-| `speak`      | `marked`    | `marked`: only the 🔊 lines the agent chooses to write. `all`: every message |
-| `narration` | `live`      | `live`: running commentary + alerts + end-of-task summary. `quiet`: alerts + summary only |
-| `engine`     | `kokoro`    | `kokoro` (neural, local) or `system` (Windows SAPI / macOS `say` / espeak-ng) |
-| `voice`      | `af_heart`  | Kokoro voice; `a`=American, `b`=British, then `f`/`m`. Try `am_michael`, `bf_emma`, `bm_george` |
-| `speed`      | `1.1`       | speaking rate |
-| `mode`       | `queue`     | `queue`: lines play in order (older backlog is dropped). `interrupt`: a new line cuts off the current one |
-| `final_only` | `false`     | only speak each turn's final message, not the running commentary |
-| `claude`     | `true`      | narrate Claude Code |
-| `codex`      | `true`      | narrate Codex |
-| `max_chars`  | `400`       | with `speak all`, long messages are trimmed to their first sentences |
-| `muted`      | `false`     | same as `agent-voice mute` |
-| `hotkey`     | `shift+backspace` | global shortcut that stops the speech playing right now; e.g. `ctrl+alt+x`, `f9`; `off` disables it |
+### ⌨️ Stop shortcut
 
-Settings live in `~/.agent-voice/config.json`.
+Press the shortcut in any window to stop the speech playing right now; anything queued is
+dropped too. It only acts while something is being spoken.
 
-### Stop shortcut
-
-Press the shortcut in any window to stop the current speech (anything queued is dropped too).
-It only acts while something is being spoken. The key press still reaches the focused app,
-so if Shift+Backspace deletes a character in your prompt, pick another combo:
-
-```text
-agent-voice config hotkey ctrl+alt+x
+```powershell
+agent-voice config hotkey ctrl+alt+x   # any combo
+agent-voice config hotkey off          # disable
 ```
 
-Names: `ctrl`, `alt` (`option`), `shift`, `win`/`cmd`, letters, digits, `f1`-`f20`, `space`,
-`backspace`, `esc`, `enter`, `tab`, ... joined with `+`.
-On macOS, allow your terminal (or Python) under *System Settings > Privacy & Security > Accessibility*.
-On Linux it needs X11; global shortcuts are not available under Wayland.
+Key names: `ctrl`, `alt` (`option`), `shift`, `win` (`cmd`), letters, digits, `f1`–`f20`,
+`space`, `backspace`, `esc`, `enter`, `tab` and so on, joined with `+`.
 
-## How it works
+> [!NOTE]
+> The key press still reaches the focused app. If <kbd>Shift</kbd>+<kbd>Backspace</kbd> deleting a
+> character in your prompt bothers you, pick a combo that does nothing there, like `ctrl+alt+x`.
 
-`agent-voice instructions on` (run by the installer) adds a "Voice updates"
-section to the agents' global instructions (`~/.claude/CLAUDE.md`,
-`~/.codex/AGENTS.md`), so the agent itself decides when to speak. In short:
+## 🔍 How it works
 
-> Only lines that start with `🔊 ` are spoken.
-> **Live narration:** when you start a step, form a hypothesis, find a cause or see tests
-> pass or fail, say it in one short first-person sentence. A few lines per task, not every tool call.
-> **Quick alerts:** one sentence when you need input or approval, or are blocked.
-> **Work summary:** at the end of a task, 2-4 sentences: what you did and why, how you
-> checked it, and what's left or what you need from the user.
-> Write for the ear: no code, paths, URLs or markdown.
+```mermaid
+flowchart LR
+    I["agent-voice instructions<br/>(CLAUDE.md / AGENTS.md)"] -. teaches .-> A
+    A["Claude Code / Codex"] -->|writes session| T[("transcript<br/>.jsonl")]
+    T -->|tail new lines| W["watcher"]
+    W -->|keep 🔊 lines| C["cleaner<br/>(paths, URLs, code → speech)"]
+    C --> Q["queue"]
+    Q --> K["Kokoro TTS<br/>(local)"]
+    K --> S(("🔊"))
+    H["⌨ Shift+Backspace"] -. stop .-> Q
+```
 
-`agent-voice config narration quiet` drops the live narration (alerts and summary
-only) and rewrites the instructions; `live` brings it back. To change the wording,
-edit `src/agent_voice/instructions.py` and rerun `agent-voice instructions on`.
-Already-open agent sessions keep the old instructions until restarted.
+1. **Instructions.** A short section in the agents' global instruction files asks them to write
+   🔊 lines for live narration, alerts and an end-of-task summary, in plain spoken English.
+   The wording lives in [`instructions.py`](src/agent_voice/instructions.py).
+2. **Transcripts.** Both agents already save every session as JSON lines. agent-voice tails
+   only the files being written right now, and never reads out older history.
 
-Both agents already write every session to disk as JSON lines:
+   | Agent | Transcript | Read from |
+   |---|---|---|
+   | Claude Code | `~/.claude/projects/<project>/<session>.jsonl` | assistant `text` blocks (not tool calls, thinking or subagents) |
+   | Codex | `~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl` | assistant `message` items |
 
-| agent       | transcript                                         | what is spoken |
-|-------------|----------------------------------------------------|----------------|
-| Claude Code | `~/.claude/projects/<project>/<session>.jsonl`     | `assistant` entries' `text` blocks (not `tool_use`, not `thinking`, not subagents) |
-| Codex       | `~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl`     | `response_item` messages with `role: assistant` (`phase: commentary` / `final_answer`) |
+3. **Cleaning.** [`cleaner.py`](src/agent_voice/cleaner.py) turns screen text into something
+   pleasant to hear.
+4. **Speaking.** Kokoro synthesizes the next sentence while the current one plays, so speech
+   starts within about half a second.
 
-agent-voice is a small background process that tails the transcripts that are
-being written to, picks out the 🔊 lines (or whole messages with `speak all`),
-cleans them for speech (`src/agent_voice/cleaner.py`), and speaks them. No hooks
-are involved, so it never slows the agent down. History that existed before it
-started is never read out.
+No hooks are involved, so the agent never waits on agent-voice. A localhost port (`47821`,
+override with `AGENT_VOICE_PORT`) carries the `mute` / `stop` / … commands and keeps a single
+copy running. `CLAUDE_CONFIG_DIR` and `CODEX_HOME` are respected.
 
-`CLAUDE_CONFIG_DIR` and `CODEX_HOME` are respected if you've moved those folders.
-A localhost port (`47821`, override with `AGENT_VOICE_PORT`) is used for the
-`mute`/`stop`/... commands and to make sure only one copy runs.
+## 🩺 Troubleshooting
 
-## Uninstall
+<details>
+<summary><b>I don't hear anything</b></summary>
 
-`uninstall.ps1` (Windows) or `./uninstall.sh`. pyenv and its Python are left in
-place since other projects may use them.
+1. `agent-voice status`: is it running and not muted?
+2. `agent-voice say "test"`: if this is silent, check your audio output device and volume.
+3. `agent-voice log`: every spoken line is logged as `speaking: …`.
 
-## Develop
+</details>
+
+<details>
+<summary><b>The voice works, but my agent never speaks</b></summary>
+
+- Instructions load when a session **starts**: open a new Claude Code / Codex session.
+- `agent-voice instructions` shows whether they're installed; `agent-voice instructions on` adds them.
+- To hear every message regardless, use `agent-voice config speak all`.
+
+</details>
+
+<details>
+<summary><b>It talks too much or too little</b></summary>
+
+- Too much: `agent-voice config narration quiet` keeps only alerts and the end-of-task summary.
+- Too little: `agent-voice config narration live`, or `speak all` for everything.
+
+</details>
+
+<details>
+<summary><b>The stop shortcut doesn't work</b></summary>
+
+- **macOS**: allow your terminal (or Python) in *System Settings → Privacy & Security → Accessibility*.
+- **Linux**: global shortcuts need X11; they are not available on Wayland. Use `agent-voice skip` instead.
+- **Windows**: shortcuts aren't seen while an app running as administrator is focused.
+
+</details>
+
+<details>
+<summary><b>Linux: install fails building Python, or there's no sound</b></summary>
+
+pyenv builds Python from source. On Debian/Ubuntu:
 
 ```bash
-~/.agent-voice/venv/Scripts/python -m pip install -e ".[dev]"   # bin/ on macOS/Linux
-~/.agent-voice/venv/Scripts/python -m pytest
-agent-voice run   # foreground, logs to the console
+sudo apt-get install -y build-essential libssl-dev zlib1g-dev libbz2-dev \
+  libreadline-dev libsqlite3-dev libffi-dev liblzma-dev libportaudio2
 ```
+
+</details>
+
+## 🔐 Privacy
+
+Everything runs locally. agent-voice only reads your own agent session files, makes no network
+calls after installing, and sends nothing anywhere. The one thing it writes outside
+`~/.agent-voice` is the marked *Voice updates* section in your agents' instruction files.
+
+## 🗑 Uninstall
+
+```powershell
+irm https://raw.githubusercontent.com/Yugendiran/agent-voice/main/uninstall.ps1 | iex   # Windows
+```
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Yugendiran/agent-voice/main/uninstall.sh | bash   # macOS / Linux
+```
+
+This stops agent-voice and removes it, its autostart entry, PATH entry and the agent
+instructions. pyenv and its Python stay, since other projects may use them.
+
+## 🛠 Development
+
+```bash
+git clone https://github.com/Yugendiran/agent-voice && cd agent-voice
+~/.agent-voice/venv/Scripts/python -m pip install -e ".[dev]"   # bin/ instead of Scripts/ on macOS/Linux
+~/.agent-voice/venv/Scripts/python -m pytest
+agent-voice restart     # pick up your changes
+agent-voice run         # or run in the foreground with logs
+```
+
+| Module | Role |
+|---|---|
+| [`sources.py`](src/agent_voice/sources.py) | Where each agent's transcripts live and how to parse them |
+| [`watcher.py`](src/agent_voice/watcher.py) | Tails the active transcript files |
+| [`instructions.py`](src/agent_voice/instructions.py) | The voice-line instructions and 🔊 extraction |
+| [`cleaner.py`](src/agent_voice/cleaner.py) | Markdown → speakable text |
+| [`tts.py`](src/agent_voice/tts.py) · [`speaker.py`](src/agent_voice/speaker.py) | Voices and the playback queue |
+| [`daemon.py`](src/agent_voice/daemon.py) · [`cli.py`](src/agent_voice/cli.py) | Background process and commands |
+
+## 🙏 Credits
+
+[Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) by hexgrad ·
+[kokoro-onnx](https://github.com/thewh1teagle/kokoro-onnx) ·
+[pynput](https://github.com/moses-palmer/pynput) ·
+[pyenv](https://github.com/pyenv/pyenv) / [pyenv-win](https://github.com/pyenv-win/pyenv-win)
+
+## 📄 License
+
+[MIT](LICENSE)
