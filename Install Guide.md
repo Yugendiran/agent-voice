@@ -70,7 +70,12 @@ From a clone: `./install.sh` (add `--no-autostart` to skip start-at-login).
 
 Running it again updates an existing install and reuses everything already downloaded.
 
-## Step 2: Check it works
+## Step 2: Test it
+
+> **Agents:** run this test yourself, don't just tell the user to. Then ask the user
+> whether they heard the sentence, and offer to press <kbd>Shift</kbd>+<kbd>Backspace</kbd>
+> during a longer `say` to try the stop shortcut (you can't press keys for them). If they
+> heard nothing, go to [Step 3](#step-3-if-something-failed).
 
 A terminal opened **before** the install won't have `agent-voice` on its PATH yet. Either
 open a new terminal or call it by its full path:
@@ -82,11 +87,19 @@ open a new terminal or call it by its full path:
 
 ```bash
 agent-voice status        # expect: running (speaking, speak=marked, ...)
-agent-voice say "Agent Voice is installed and ready."
+agent-voice say "Hello! Agent Voice is installed and ready."   # you should hear this
 agent-voice instructions  # expect: Claude Code on / Codex on
 ```
 
-If `status` says it isn't running, start it with `agent-voice start`.
+If `status` says it isn't running, start it with `agent-voice start` and test again.
+`agent-voice log` should now show a `speaking: Hello! Agent Voice is installed and ready.` line.
+
+To try the stop shortcut, run a longer sentence and press <kbd>Shift</kbd>+<kbd>Backspace</kbd>
+while it's talking; it should stop at once:
+
+```bash
+agent-voice say "This is a longer test sentence, so there is time to press shift and backspace and hear the voice stop before the end."
+```
 
 ## Step 3: If something failed
 

@@ -103,10 +103,11 @@ https://raw.githubusercontent.com/Yugendiran/agent-voice/main/Install%20Guide.md
 and follow it step by step.
 ```
 
-The agent reads the [Install Guide](Install%20Guide.md), runs the installer for your OS,
-checks that the voice works and fixes problems on the way. When it's done it asks you to
-**restart your Claude Code / Codex sessions**, since the voice instructions are only read when
-a session starts.
+The agent reads the [Install Guide](Install%20Guide.md), runs the installer for your OS and
+fixes problems on the way. It then **runs the [test](#-test-it) itself**: you'll hear
+*"Hello! Agent Voice is installed and ready."*, and it asks you whether you did. When it's done
+it asks you to **restart your Claude Code / Codex sessions**, since the voice instructions are
+only read when a session starts.
 
 > [!IMPORTANT]
 > The agent needs permission to run shell commands and to reach the internet. Codex's
@@ -139,7 +140,9 @@ Then **restart your Claude Code / Codex sessions**. That's it.
 
 ### ✅ Test it
 
-Open a **new** terminal (so `agent-voice` is on your PATH) and run:
+> **Option 1:** your agent already ran this test for you. Skip to *try it for real* below.
+
+After a manual install, open a **new** terminal (so `agent-voice` is on your PATH) and run:
 
 ```bash
 agent-voice status
