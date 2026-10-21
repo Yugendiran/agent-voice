@@ -21,6 +21,7 @@ agent-voice: hear what Claude Code and Codex say while they work.
 commands:
   start             start narrating in the background
   stop              stop the background narrator
+  restart           stop and start again (e.g. after updating agent-voice)
   status            show whether it is running
   mute | unmute     silence / resume speech (toggle flips it)
   skip              stop the message being spoken right now
@@ -87,6 +88,20 @@ def cmd_start() -> int:
             return 0
     print(f"agent-voice did not report in; see the log: {LOG_PATH}")
     return 1
+
+
+def cmd_restart() -> int:
+    if send("stop") is not None:
+        # Wait for the old process to release the control port before starting.
+        for _ in range(40):
+            time.sleep(0.25)
+            if send("status", timeout=0.5) is None:
+                break
+        else:
+            print("the running narrator did not stop; see: agent-voice log")
+            return 1
+        print("agent-voice stopped.")
+    return cmd_start()
 
 
 def cmd_config(args: list[str]) -> int:
@@ -187,6 +202,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_run(console=not ns.quiet and sys.stdout is not None)
     if cmd == "start":
         return cmd_start()
+    if cmd == "restart":
+        return cmd_restart()
     if cmd in ("stop", "status", "mute", "unmute", "toggle", "skip"):
         reply = send(cmd)
         if reply is None:

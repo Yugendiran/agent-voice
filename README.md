@@ -70,7 +70,7 @@ That's it. Start a **new** Claude Code or Codex session and you'll hear it when 
 
 ```text
 agent-voice status          is it running?
-agent-voice start | stop
+agent-voice start | stop | restart
 agent-voice mute | unmute   (toggle flips it)
 agent-voice skip            cut off the current sentence
                             (or press Shift+Backspace anywhere, see `hotkey` below)
