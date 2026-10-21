@@ -14,7 +14,7 @@ with a neural voice that runs entirely on your machine.
 [![Claude Code](https://img.shields.io/badge/works%20with-Claude%20Code-D97757)](https://claude.com/claude-code)
 [![Codex](https://img.shields.io/badge/works%20with-Codex-000000)](https://github.com/openai/codex)
 
-[Install](#-install) · [Agent install](#-let-your-agents-install-itself) · [Usage](#-usage) · [Settings](#%EF%B8%8F-settings) · [How it works](#-how-it-works) · [Troubleshooting](#-troubleshooting)
+[Installation](#-installation) · [Usage](#-usage) · [Settings](#%EF%B8%8F-settings) · [How it works](#-how-it-works) · [Troubleshooting](#-troubleshooting)
 
 </div>
 
@@ -82,7 +82,39 @@ Nothing else on your system is touched.
 </tr>
 </table>
 
-## 📥 Install
+## 📥 Installation
+
+Choose one of the two ways. Both end up with the same setup.
+
+| | 🤖 **Option 1: Let your agents install itself** | 🛠️ **Option 2: Manual installation** |
+|---|---|---|
+| **You do** | Paste one prompt into Claude Code or Codex | Run one command in a terminal |
+| **Best for** | Hands-off setup; the agent checks and fixes problems for you | Full control over every step |
+
+---
+
+### 🤖 Option 1: Let your agents install itself
+
+Paste this into **Claude Code** or **Codex**:
+
+```text
+Install Agent Voice on this machine for me. Read the install guide at
+https://raw.githubusercontent.com/Yugendiran/agent-voice/main/Install%20Guide.md
+and follow it step by step.
+```
+
+The agent reads the [Install Guide](Install%20Guide.md), runs the installer for your OS,
+checks that the voice works and fixes problems on the way. When it's done it asks you to
+**restart your Claude Code / Codex sessions**, since the voice instructions are only read when
+a session starts.
+
+> [!IMPORTANT]
+> The agent needs permission to run shell commands and to reach the internet. Codex's
+> default sandbox blocks network access, so approve the installer when it asks.
+
+---
+
+### 🛠️ Option 2: Manual installation
 
 **Windows** (PowerShell):
 
@@ -96,30 +128,12 @@ irm https://raw.githubusercontent.com/Yugendiran/agent-voice/main/install.ps1 | 
 curl -fsSL https://raw.githubusercontent.com/Yugendiran/agent-voice/main/install.sh | bash
 ```
 
-Then **start a new Claude Code or Codex session**. That's it.
+Then **restart your Claude Code / Codex sessions**. That's it.
 
 > [!TIP]
 > Linux prerequisites, installing from a clone, what the installer changes, checking the
 > install, fixes for common problems, updating and uninstalling are all in the
 > 📖 **[Install Guide](Install%20Guide.md)**.
-
-## 🤖 Let your agents install itself
-
-Rather not touch a terminal? Paste this into Claude Code or Codex:
-
-```text
-Install Agent Voice on this machine for me. Read the install guide at
-https://raw.githubusercontent.com/Yugendiran/agent-voice/main/Install%20Guide.md
-and follow it step by step.
-```
-
-The agent reads the [Install Guide](Install%20Guide.md), runs the installer for your OS, checks that the voice works,
-fixes problems on the way, and finally asks you to **restart your Claude Code / Codex
-sessions**, since the voice instructions are only read when a session starts.
-
-> [!IMPORTANT]
-> The agent needs permission to run shell commands and to reach the internet. Codex's
-> default sandbox blocks network access, so approve the installer when it asks.
 
 ## 🎛 Usage
 
