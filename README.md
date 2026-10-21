@@ -99,50 +99,27 @@ curl -fsSL https://raw.githubusercontent.com/Yugendiran/agent-voice/main/install
 Then **start a new Claude Code or Codex session**. That's it.
 
 > [!TIP]
-> To update, run the same command again; it reuses everything already installed.
-> From a clone you can also double-click `install.cmd` (Windows) or run `./install.sh`.
-
-<details>
-<summary><b>What the installer does</b></summary>
-
-1. Installs [pyenv](https://github.com/pyenv/pyenv) ([pyenv-win](https://github.com/pyenv-win/pyenv-win) on Windows) if missing, then the Python version in [`.python-version`](.python-version)
-2. Creates a private virtualenv in `~/.agent-voice/venv`, leaving your other Pythons alone
-3. Downloads the voice model (~120 MB) to `~/.agent-voice/models`
-4. Adds the `agent-voice` command to your PATH
-5. Adds a short *Voice updates* section to `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`,
-   between `agent-voice:begin` / `end` markers. Your own content is kept.
-6. Starts agent-voice now and at every login. Skip this with `-NoAutostart` / `--no-autostart`
-   when running from a clone, or later with `agent-voice autostart off`.
-
-</details>
+> Linux prerequisites, installing from a clone, what the installer changes, checking the
+> install, fixes for common problems, updating and uninstalling are all in the
+> 📖 **[Install Guide](Install%20Guide.md)**.
 
 ## 🤖 Let your agents install itself
 
-Rather not touch a terminal? Paste this into Claude Code or Codex and let the agent do it:
+Rather not touch a terminal? Paste this into Claude Code or Codex:
 
 ```text
-Install Agent Voice (https://github.com/Yugendiran/agent-voice) on this machine for me.
-
-1. Check which OS I'm on and run the matching installer. It downloads about 150 MB
-   and can take a few minutes, so use a long timeout and don't cancel it early.
-   - Windows (PowerShell): irm https://raw.githubusercontent.com/Yugendiran/agent-voice/main/install.ps1 | iex
-   - macOS / Linux:        curl -fsSL https://raw.githubusercontent.com/Yugendiran/agent-voice/main/install.sh | bash
-2. Verify it works. The agent-voice command may not be on PATH in this shell yet,
-   so call it by its full path if needed:
-   ~/.agent-voice/venv/Scripts/agent-voice.exe (Windows) or ~/.agent-voice/venv/bin/agent-voice.
-   Run "agent-voice status", then: agent-voice say "Agent Voice is installed and ready."
-3. If a step fails, read the installer output and "agent-voice log", fix the cause
-   and try again. If it needs something only I can do (like a sudo password),
-   stop and tell me exactly what to run.
-4. When it works, tell me in a few sentences what was installed, then remind me to
-   restart this Claude Code / Codex session (and any other open ones) so the new
-   voice instructions take effect.
+Install Agent Voice on this machine for me. Read the install guide at
+https://raw.githubusercontent.com/Yugendiran/agent-voice/main/Install%20Guide.md
+and follow it step by step.
 ```
 
+The agent reads the [Install Guide](Install%20Guide.md), runs the installer for your OS, checks that the voice works,
+fixes problems on the way, and finally asks you to **restart your Claude Code / Codex
+sessions**, since the voice instructions are only read when a session starts.
+
 > [!IMPORTANT]
-> The agent needs permission to run shell commands and to reach the internet. Codex's default
-> sandbox blocks network access, so approve the installer when it asks. Once it's done,
-> **restart your agent sessions**: the voice instructions are only read when a session starts.
+> The agent needs permission to run shell commands and to reach the internet. Codex's
+> default sandbox blocks network access, so approve the installer when it asks.
 
 ## 🎛 Usage
 
@@ -282,14 +259,10 @@ copy running. `CLAUDE_CONFIG_DIR` and `CODEX_HOME` are respected.
 </details>
 
 <details>
-<summary><b>Linux: install fails building Python, or there's no sound</b></summary>
+<summary><b>The install failed</b></summary>
 
-pyenv builds Python from source. On Debian/Ubuntu:
-
-```bash
-sudo apt-get install -y build-essential libssl-dev zlib1g-dev libbz2-dev \
-  libreadline-dev libsqlite3-dev libffi-dev liblzma-dev libportaudio2
-```
+See [Step 3 of the Install Guide](Install%20Guide.md#step-3-if-something-failed) for fixes
+by symptom (Linux build packages, PortAudio, execution policy, interrupted downloads, Codex sandbox).
 
 </details>
 
