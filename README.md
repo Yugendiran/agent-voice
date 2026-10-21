@@ -14,7 +14,7 @@ with a neural voice that runs entirely on your machine.
 [![Claude Code](https://img.shields.io/badge/works%20with-Claude%20Code-D97757)](https://claude.com/claude-code)
 [![Codex](https://img.shields.io/badge/works%20with-Codex-000000)](https://github.com/openai/codex)
 
-[Install](#-install) · [Usage](#-usage) · [Settings](#%EF%B8%8F-settings) · [How it works](#-how-it-works) · [Troubleshooting](#-troubleshooting)
+[Install](#-install) · [Agent install](#-let-your-agents-install-itself) · [Usage](#-usage) · [Settings](#%EF%B8%8F-settings) · [How it works](#-how-it-works) · [Troubleshooting](#-troubleshooting)
 
 </div>
 
@@ -115,6 +115,34 @@ Then **start a new Claude Code or Codex session**. That's it.
    when running from a clone, or later with `agent-voice autostart off`.
 
 </details>
+
+## 🤖 Let your agents install itself
+
+Rather not touch a terminal? Paste this into Claude Code or Codex and let the agent do it:
+
+```text
+Install Agent Voice (https://github.com/Yugendiran/agent-voice) on this machine for me.
+
+1. Check which OS I'm on and run the matching installer. It downloads about 150 MB
+   and can take a few minutes, so use a long timeout and don't cancel it early.
+   - Windows (PowerShell): irm https://raw.githubusercontent.com/Yugendiran/agent-voice/main/install.ps1 | iex
+   - macOS / Linux:        curl -fsSL https://raw.githubusercontent.com/Yugendiran/agent-voice/main/install.sh | bash
+2. Verify it works. The agent-voice command may not be on PATH in this shell yet,
+   so call it by its full path if needed:
+   ~/.agent-voice/venv/Scripts/agent-voice.exe (Windows) or ~/.agent-voice/venv/bin/agent-voice.
+   Run "agent-voice status", then: agent-voice say "Agent Voice is installed and ready."
+3. If a step fails, read the installer output and "agent-voice log", fix the cause
+   and try again. If it needs something only I can do (like a sudo password),
+   stop and tell me exactly what to run.
+4. When it works, tell me in a few sentences what was installed, then remind me to
+   restart this Claude Code / Codex session (and any other open ones) so the new
+   voice instructions take effect.
+```
+
+> [!IMPORTANT]
+> The agent needs permission to run shell commands and to reach the internet. Codex's default
+> sandbox blocks network access, so approve the installer when it asks. Once it's done,
+> **restart your agent sessions**: the voice instructions are only read when a session starts.
 
 ## 🎛 Usage
 
