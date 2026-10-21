@@ -1,3 +1,5 @@
+import pytest
+
 from agent_voice import instructions
 from agent_voice.instructions import BEGIN, END, voice_lines
 
@@ -35,7 +37,7 @@ def test_install_keeps_user_content(tmp_path):
     assert text.startswith("# My rules\n\nBe concise.\n\n" + BEGIN)
 
     # An outdated block is replaced in place, not duplicated.
-    path.write_text(text.replace("most messages", "OLD"), encoding="utf-8")
+    path.write_text(text.replace("Voice updates", "OLD"), encoding="utf-8")
     assert instructions.install(path) == "updated"
     assert path.read_text(encoding="utf-8").count(BEGIN) == 1
 
@@ -58,3 +60,35 @@ def test_narrator_speaks_only_marked_lines_by_default():
 
     n.cfg.speak = "all"
     assert n.speech_for(plain) == "Reading the files now."
+
+
+def test_marked_work_summary_is_not_trimmed():
+    from agent_voice.config import Config
+    from agent_voice.daemon import Narrator
+    from agent_voice.sources import Utterance
+
+    n = Narrator.__new__(Narrator)
+    n.cfg = Config()
+    summary = (
+        "I fixed the join class flow. The join button was calling the old session endpoint, "
+        "so I switched it to the new one and added a retry when the class has not started yet. "
+        "All twelve tests pass and I checked it in the app. Nothing is committed yet, "
+        "so tell me if you want me to commit it."
+    )
+    n.cfg.max_chars = 100  # speak=all would trim to this; voice lines are not
+    assert n.speech_for(Utterance("claude", "Done.\n\n🔊 " + summary, True, "s")) == summary
+
+
+def test_narration_styles(tmp_path):
+    live, quiet = instructions.text("live"), instructions.text("quiet")
+    assert "Live narration" in live and "Live narration" not in quiet
+    assert "Work summary" in live and "Work summary" in quiet
+
+    path = tmp_path / "CLAUDE.md"
+    instructions.install(path, "quiet")
+    assert instructions.install(path, "live") == "updated"
+    assert "Live narration" in path.read_text(encoding="utf-8")
+    assert path.read_text(encoding="utf-8").count(BEGIN) == 1
+
+    with pytest.raises(ValueError):
+        instructions.text("chatty")

@@ -2,29 +2,36 @@
 
 Hear what **Claude Code** and **Codex** say while they work.
 
-Coding agents narrate a lot as they go. Hearing all of it is too much, so
-agent-voice lets **the agent decide what's worth saying**: it teaches Claude
-Code and Codex to add a short spoken line, starting with 🔊, only when it
-matters: a task is done, it needs your decision, or it's blocked.
+Coding agents write a lot as they go, and hearing all of it is too much. So
+agent-voice lets **the agent decide what's worth saying**. It teaches Claude
+Code and Codex to write spoken lines, starting with 🔊, like a developer
+talking you through their work:
 
 ```text
-I changed add() in calc.py from a - b to a + b and ran a check: add(2, 3) == 5 ...
-
-🔊 The add bug is fixed, and the check passed.      <- only this is spoken
+🔊 Opening the shop file to look at the cart total and tax code.
+🔊 Found three bugs: quantity is ignored, rounding drops cents, and tax divides by ten.
+   ...edits, test runs, diffs (shown on screen, not spoken)...
+🔊 I fixed the cart total and the tax calculation. The total now multiplies each
+   price by its quantity and keeps two decimal places, and the tax now treats
+   eighteen as eighteen percent. My quick checks all passed. The tax result still
+   isn't rounded, so tell me if you want it rounded to two decimals too.
 ```
 
-agent-voice speaks those lines with a small neural voice that runs entirely on
-your machine, so you can look away from the terminal and still know when to come back.
+That's **live narration** while it works, **alerts** when it needs you or is
+blocked, and a **work summary** at the end: what was done, how it was checked,
+and what's left. agent-voice speaks only those lines, with a small neural voice
+that runs entirely on your machine.
 
-- The agent picks the moments; routine progress stays silent
-  (or set `speak all` to hear every message)
+- The agent picks the moments. Prefer only alerts and the summary? `agent-voice config narration quiet`
+  (or `speak all` to hear every message in full)
 - Never reads tool calls, command output, code or diffs
 - Turns screen-only text into speech-friendly text: code blocks are skipped, URLs become "a link",
   paths become "a file path", IPs/hashes/UUIDs are named instead of spelled out
 - Local and offline: [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) (~120 MB, CPU, ~3x faster than real time),
   or the built-in OS voice with no download at all
 - Works with Claude Code (CLI, VS Code, desktop) and Codex (CLI, VS Code) at the same time
-- New messages interrupt stale ones, so it never falls behind
+- Lines play in order and stale ones are dropped, so it never falls behind
+- Press Shift+Backspace anywhere to stop the current speech (configurable)
 
 ## Install
 
@@ -82,14 +89,15 @@ agent-voice run             run in the foreground with console logging
 | key          | default     | meaning |
 |--------------|-------------|---------|
 | `speak`      | `marked`    | `marked`: only the 🔊 lines the agent chooses to write. `all`: every message |
+| `narration` | `live`      | `live`: running commentary + alerts + end-of-task summary. `quiet`: alerts + summary only |
 | `engine`     | `kokoro`    | `kokoro` (neural, local) or `system` (Windows SAPI / macOS `say` / espeak-ng) |
 | `voice`      | `af_heart`  | Kokoro voice; `a`=American, `b`=British, then `f`/`m`. Try `am_michael`, `bf_emma`, `bm_george` |
 | `speed`      | `1.1`       | speaking rate |
-| `mode`       | `interrupt` | `interrupt`: a new message cuts off the current one. `queue`: finish, then speak the next |
+| `mode`       | `queue`     | `queue`: lines play in order (older backlog is dropped). `interrupt`: a new line cuts off the current one |
 | `final_only` | `false`     | only speak each turn's final message, not the running commentary |
 | `claude`     | `true`      | narrate Claude Code |
 | `codex`      | `true`      | narrate Codex |
-| `max_chars`  | `400`       | long messages are trimmed to their first sentences |
+| `max_chars`  | `400`       | with `speak all`, long messages are trimmed to their first sentences |
 | `muted`      | `false`     | same as `agent-voice mute` |
 | `hotkey`     | `shift+backspace` | global shortcut that stops the speech playing right now; e.g. `ctrl+alt+x`, `f9`; `off` disables it |
 
@@ -112,16 +120,22 @@ On Linux it needs X11; global shortcuts are not available under Wayland.
 
 ## How it works
 
-`agent-voice instructions on` (run by the installer) adds this to the agents'
-global instructions, so the agent itself decides when to speak:
+`agent-voice instructions on` (run by the installer) adds a "Voice updates"
+section to the agents' global instructions (`~/.claude/CLAUDE.md`,
+`~/.codex/AGENTS.md`), so the agent itself decides when to speak. In short:
 
-> Only lines that start with `🔊 ` are spoken. Add one only when the user would
-> want to be told right away: the task or a major step is done, you need their
-> input, you're blocked, or you found something important. Skip it for routine
-> progress. One short sentence, no code, paths or URLs.
+> Only lines that start with `🔊 ` are spoken.
+> **Live narration:** when you start a step, form a hypothesis, find a cause or see tests
+> pass or fail, say it in one short first-person sentence. A few lines per task, not every tool call.
+> **Quick alerts:** one sentence when you need input or approval, or are blocked.
+> **Work summary:** at the end of a task, 2-4 sentences: what you did and why, how you
+> checked it, and what's left or what you need from the user.
+> Write for the ear: no code, paths, URLs or markdown.
 
-Edit the wording in `src/agent_voice/instructions.py` and rerun
-`agent-voice instructions on` to update it.
+`agent-voice config narration quiet` drops the live narration (alerts and summary
+only) and rewrites the instructions; `live` brings it back. To change the wording,
+edit `src/agent_voice/instructions.py` and rerun `agent-voice instructions on`.
+Already-open agent sessions keep the old instructions until restarted.
 
 Both agents already write every session to disk as JSON lines:
 

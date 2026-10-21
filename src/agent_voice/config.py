@@ -23,18 +23,23 @@ class Config:
     # "marked": speak only the short 🔊 lines the agents write for you (see
     # `agent-voice instructions`). "all": speak every message.
     speak: str = "marked"
+    # What the agents are told to say (rewrites their instructions when changed):
+    # "live": short running commentary while working, plus alerts and a work
+    # summary at the end. "quiet": only alerts and the end-of-task summary.
+    narration: str = "live"
     voice: str = "af_heart"
     speed: float = 1.1
     # "interrupt": a new message cuts off the one being spoken.
     # "queue": messages are spoken in order (stale backlog is still dropped).
-    mode: str = "interrupt"
+    mode: str = "queue"
     # Which agents to listen to.
     claude: bool = True
     codex: bool = True
     # Speak only the final answer of each turn (Codex marks these; for Claude
     # this means the last text before the turn ends) instead of every update.
     final_only: bool = False
-    # Longer messages are cut at a sentence boundary near this many characters.
+    # With speak=all, longer messages are cut at a sentence boundary near this
+    # many characters. (Agent-written voice lines may run up to 1200.)
     max_chars: int = 400
     muted: bool = False
     # Global shortcut that stops the speech playing right now ("" disables it).

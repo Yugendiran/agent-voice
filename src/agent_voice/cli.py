@@ -94,6 +94,8 @@ def cmd_config(args: list[str]) -> int:
     if len(args) >= 2:
         value = " ".join(args[1:])
         try:
+            if args[0] == "narration" and value not in instructions.NARRATION_STYLES:
+                raise ValueError(f"narration must be one of: {', '.join(instructions.NARRATION_STYLES)}")
             if args[0] == "hotkey":
                 if value.strip().lower() in ("off", "none", "disable", "disabled"):
                     value = ""
@@ -106,6 +108,11 @@ def cmd_config(args: list[str]) -> int:
             print(exc)
             return 1
         cfg.save()
+        if args[0] == "narration":
+            for agent, path in instructions.targets().items():
+                if instructions.installed(path):
+                    instructions.install(path, cfg.narration)
+                    print(f"  {agent} instructions updated (new sessions use them)")
         if send("reload") is not None:
             print("saved; running narrator reloaded.")
         else:
@@ -144,13 +151,14 @@ def cmd_say(text: str) -> int:
 def cmd_instructions(choice: str) -> int:
     for agent, path in instructions.targets().items():
         if choice == "on":
-            print(f"  {agent:<12} {instructions.install(path)}: {path}")
+            print(f"  {agent:<12} {instructions.install(path, Config.load().narration)}: {path}")
         elif choice == "off":
             print(f"  {agent:<12} {'removed' if instructions.remove(path) else 'not present'}: {path}")
         else:
             print(f"  {agent:<12} {'on' if instructions.installed(path) else 'off'}: {path}")
     if choice == "on":
-        print("\nNew Claude Code / Codex sessions will add short 🔊 lines; agent-voice speaks only those.")
+        print(f"\nNew Claude Code / Codex sessions will add 🔊 voice lines (narration={Config.load().narration});")
+        print("agent-voice speaks only those. Switch style: agent-voice config narration live|quiet")
         print("Sessions that are already open keep their old instructions until restarted.")
     if choice == "off" and Config.load().speak == "marked":
         print("\nNote: speak=marked, so nothing will be spoken. Use: agent-voice config speak all")

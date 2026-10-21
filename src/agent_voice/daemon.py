@@ -18,6 +18,9 @@ from .watcher import Watcher
 
 log = logging.getLogger("agent_voice")
 
+# Cap for agent-written voice lines (a work summary is ~300-500 characters).
+MARKED_MAX_CHARS = 1200
+
 
 class AlreadyRunning(RuntimeError):
     pass
@@ -102,8 +105,13 @@ class Narrator:
         """What to say for a message, or "" to stay silent."""
         if not self.wants(u):
             return ""
-        text = voice_lines(u.text) if self.cfg.speak == "marked" else u.text
-        return clean(text, self.cfg.max_chars) if text else ""
+        if self.cfg.speak == "marked":
+            # The agent wrote these for the ear and chose their length, so only
+            # guard against runaways instead of trimming to max_chars.
+            text, limit = voice_lines(u.text), max(self.cfg.max_chars, MARKED_MAX_CHARS)
+        else:
+            text, limit = u.text, self.cfg.max_chars
+        return clean(text, limit) if text else ""
 
     def run(self) -> None:
         server = self._server
