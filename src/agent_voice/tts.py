@@ -51,7 +51,10 @@ def download_models(force: bool = False) -> None:
             step = 1 if sys.stdout.isatty() else 10
             if pct // step != shown[0] // step:
                 shown[0] = pct
-                print(f"\r  {pct:3d}% of {total / 1e6:.0f} MB", end="" if step == 1 else "\n", flush=True)
+                if step == 1:
+                    print(f"\r  {pct:3d}% of {total / 1e6:.0f} MB", end="", flush=True)
+                else:
+                    print(f"  {pct:3d}% of {total / 1e6:.0f} MB", flush=True)
 
         urllib.request.urlretrieve(url, tmp, progress)
         tmp.replace(target)
