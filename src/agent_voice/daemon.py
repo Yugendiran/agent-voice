@@ -9,6 +9,7 @@ import threading
 
 from .cleaner import clean
 from .config import CONTROL_PORT, Config
+from .hotkey import Hotkey
 from .instructions import voice_lines
 from .sources import Utterance, default_sources
 from .speaker import Speaker
@@ -33,6 +34,13 @@ class Narrator:
         self.engine = make_engine(self.cfg)
         self.speaker = Speaker(self.engine, self.cfg.mode)
         self.speaker.muted = self.cfg.muted
+        self.hotkey = Hotkey(self.cfg.hotkey, self.on_hotkey)
+
+    def on_hotkey(self) -> None:
+        # Only act mid-speech, so the shortcut is harmless the rest of the time.
+        if self.speaker.speaking:
+            log.info("stopped by shortcut")
+            self.speaker.silence()
 
     # -- control commands -------------------------------------------------
     def handle(self, command: str) -> str:
@@ -41,7 +49,11 @@ class Narrator:
             return "starting"
         if cmd == "status":
             state = "muted" if self.speaker.muted else "speaking"
-            return f"running ({state}, speak={self.cfg.speak}, engine={self.engine.name}, voice={self.cfg.voice}, mode={self.cfg.mode})"
+            shortcut = self.cfg.hotkey if self.hotkey.active else "off"
+            return (
+                f"running ({state}, speak={self.cfg.speak}, engine={self.engine.name}, "
+                f"voice={self.cfg.voice}, mode={self.cfg.mode}, stop shortcut={shortcut})"
+            )
         if cmd in ("mute", "unmute", "toggle"):
             muted = {"mute": True, "unmute": False}.get(cmd, not self.speaker.muted)
             self.speaker.muted = self.cfg.muted = muted
@@ -66,6 +78,7 @@ class Narrator:
     def reload(self) -> None:
         new = Config.load()
         engine_changed = new.engine != self.cfg.engine
+        hotkey_changed = new.hotkey != self.cfg.hotkey
         # Engines hold a reference to self.cfg, so update it in place.
         self.cfg.__dict__.update(new.__dict__)
         if engine_changed:
@@ -73,6 +86,9 @@ class Narrator:
             self.engine = self.speaker.engine = make_engine(self.cfg)
         self.speaker.mode = self.cfg.mode
         self.speaker.muted = self.cfg.muted
+        if hotkey_changed:
+            self.hotkey.stop()
+            self.hotkey = Hotkey(self.cfg.hotkey, self.on_hotkey)
 
     # -- main loop ---------------------------------------------------------
     def wants(self, u: Utterance) -> bool:
@@ -102,6 +118,7 @@ class Narrator:
         finally:
             server.shutdown()
             server.server_close()
+            self.hotkey.stop()
             self.speaker.close()
             log.info("agent-voice stopped")
 

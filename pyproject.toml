@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agent-voice"
-version = "0.2.0"
+version = "0.3.0"
 description = "Speaks what Claude Code and Codex say while they work, using a local TTS model."
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
@@ -13,6 +13,7 @@ dependencies = [
     "kokoro-onnx>=0.4.9",
     "sounddevice>=0.5",
     "numpy>=1.26",
+    "pynput>=1.7",
 ]
 
 [project.optional-dependencies]

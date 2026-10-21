@@ -24,6 +24,8 @@ commands:
   status            show whether it is running
   mute | unmute     silence / resume speech (toggle flips it)
   skip              stop the message being spoken right now
+                    (or press the shortcut, shift+backspace by default:
+                     agent-voice config hotkey ctrl+alt+x  /  ... hotkey off)
   say TEXT          speak some text (useful to test your voice settings)
   run               run in the foreground, logging to the console (Ctrl+C stops)
   config            show settings;  config KEY VALUE  changes one
@@ -90,8 +92,16 @@ def cmd_start() -> int:
 def cmd_config(args: list[str]) -> int:
     cfg = Config.load()
     if len(args) >= 2:
+        value = " ".join(args[1:])
         try:
-            cfg.set(args[0], " ".join(args[1:]))
+            if args[0] == "hotkey":
+                if value.strip().lower() in ("off", "none", "disable", "disabled"):
+                    value = ""
+                else:
+                    from .hotkey import to_pynput
+
+                    to_pynput(value)  # reject typos before saving
+            cfg.set(args[0], value)
         except (KeyError, ValueError) as exc:
             print(exc)
             return 1

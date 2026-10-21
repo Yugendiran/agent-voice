@@ -22,8 +22,13 @@ class Speaker:
         self._cond = threading.Condition()
         self._cancel = threading.Event()
         self._stopped = False
+        self._speaking = False
         self._thread = threading.Thread(target=self._run, name="speaker", daemon=True)
         self._thread.start()
+
+    @property
+    def speaking(self) -> bool:
+        return self._speaking
 
     def say(self, text: str) -> None:
         if self.muted or not text:
@@ -63,8 +68,11 @@ class Speaker:
                     return
                 text = self._pending.popleft()
                 self._cancel.clear()
+            self._speaking = True
             try:
                 log.info("speaking: %s", text)
                 self.engine.speak(text, self._cancel)
             except Exception:
                 log.exception("speech failed")
+            finally:
+                self._speaking = False

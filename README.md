@@ -66,6 +66,7 @@ agent-voice status          is it running?
 agent-voice start | stop
 agent-voice mute | unmute   (toggle flips it)
 agent-voice skip            cut off the current sentence
+                            (or press Shift+Backspace anywhere, see `hotkey` below)
 agent-voice say "hello"     test the voice
 agent-voice voices          list voices
 agent-voice config          show settings
@@ -90,8 +91,24 @@ agent-voice run             run in the foreground with console logging
 | `codex`      | `true`      | narrate Codex |
 | `max_chars`  | `400`       | long messages are trimmed to their first sentences |
 | `muted`      | `false`     | same as `agent-voice mute` |
+| `hotkey`     | `shift+backspace` | global shortcut that stops the speech playing right now; e.g. `ctrl+alt+x`, `f9`; `off` disables it |
 
 Settings live in `~/.agent-voice/config.json`.
+
+### Stop shortcut
+
+Press the shortcut in any window to stop the current speech (anything queued is dropped too).
+It only acts while something is being spoken. The key press still reaches the focused app,
+so if Shift+Backspace deletes a character in your prompt, pick another combo:
+
+```text
+agent-voice config hotkey ctrl+alt+x
+```
+
+Names: `ctrl`, `alt` (`option`), `shift`, `win`/`cmd`, letters, digits, `f1`-`f20`, `space`,
+`backspace`, `esc`, `enter`, `tab`, ... joined with `+`.
+On macOS, allow your terminal (or Python) under *System Settings > Privacy & Security > Accessibility*.
+On Linux it needs X11; global shortcuts are not available under Wayland.
 
 ## How it works
 

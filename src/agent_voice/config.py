@@ -37,6 +37,9 @@ class Config:
     # Longer messages are cut at a sentence boundary near this many characters.
     max_chars: int = 400
     muted: bool = False
+    # Global shortcut that stops the speech playing right now ("" disables it).
+    # Examples: shift+backspace, ctrl+alt+x, ctrl+shift+space, f9.
+    hotkey: str = "shift+backspace"
 
     @classmethod
     def load(cls) -> "Config":
